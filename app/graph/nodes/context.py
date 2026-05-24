@@ -21,7 +21,7 @@ async def extract_context(state: ArchivistState) -> dict:
     
     print("--- CONTEXT AGENT: Extracting Architectural Intents ---")
     
-    llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0)
+    llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash", temperature=0)
     structured_llm = llm.with_structured_output(IntentOutput)
     
     prompt = f"""
