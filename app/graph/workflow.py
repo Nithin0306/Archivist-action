@@ -10,12 +10,12 @@ from app.graph.nodes.metadata import match_metadata
 def scoring_gate(state: ArchivistState):
 
     score = state.get("metadata_score", 0)
-    if score >= 5:
-        print(" => Relevance high. Routing to Deep Path.")
-        return "deep_path"
+    if score >= 8:
+        print("Detailed metadata found. Skipping diff fetch. (Fast Path)")
+        return "fast_path"  # Routes to Knowledge agent
     
-    print(" => Low relevance. Bypassing AI evaluation.")
-    return "end"
+    print("Vague 'dump' message detected. Fetching full diff. (Deep Path)")
+    return "deep_path"      # Routes to Context agent
 
 def should_handoff(state: ArchivistState):
 
@@ -37,8 +37,8 @@ workflow.add_conditional_edges(
     "metadata_agent",
     scoring_gate,
     {
-        "deep_path": "context_agent",
-        "end": END
+        "fast_path": "knowledge_agent",         # Skips Context agent
+        "deep_path": "context_agent"            # Fetches the diff
     }
 )
 
