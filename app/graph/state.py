@@ -18,3 +18,7 @@ class ArchivistState(TypedDict):
     
     # Handoff agent
     final_comment: Optional[str]
+
+    pr_title: str
+    pr_body: str
+    metadata_score: int
