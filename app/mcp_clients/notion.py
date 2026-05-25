@@ -1,15 +1,41 @@
 import os
-from mcp.server.fastmcp import FastMCP
+from notion_client import AsyncClient
 
-knowledge_mcp = FastMCP("Archivist-Knowledge")
+async def fetch_notion_adrs(intents: list[str]) -> str:
+    """Fetches text content from Notion pages in the ADR Database."""
+    token = os.getenv("NOTION_TOKEN")
+    db_id = os.getenv("NOTION_DATABASE_ID")
+    
+    if not token or not db_id:
+        return ""
 
-@knowledge_mcp.tool()
-def search_adrs(keywords: list[str]) -> str:
+    notion = AsyncClient(auth=token)
+    
+    # Query the database for active ADRs
+    response = await notion.databases.query(
+        database_id=db_id,
+        filter={
+            "property": "Status",
+            "select": {"equals": "Accepted"}
+        }
+    )
+    
+    compiled_adrs = []
+    
+    # Extract text from each page's blocks
+    for page in response.get("results", []):
+        page_id = page["id"]
+        blocks = await notion.blocks.children.list(block_id=page_id)
+        
+        page_text = ""
+        for block in blocks.get("results", []):
+            block_type = block["type"]
+            # Extract plain text from paragraphs, headings, and lists
+            if block_type in ["paragraph", "heading_1", "heading_2", "heading_3", "bulleted_list_item"]:
+                rich_text = block[block_type].get("rich_text", [])
+                text = "".join([t["plain_text"] for t in rich_text])
+                page_text += text + "\n"
+                
+        compiled_adrs.append(page_text)
 
-    # Just returns the contents of the local dummy ADR for testing purpose
-    try:
-        with open("ADR/ADR-001.md", "r") as f:
-            content = f.read()
-            return f"Found 1 relevant ADR:\n\n{content}"
-    except FileNotFoundError:
-        return "No ADRs found."
+    return "\n".join(compiled_adrs)

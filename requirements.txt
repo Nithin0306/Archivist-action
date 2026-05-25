@@ -9,3 +9,6 @@ cryptography
 langgraph>=0.0.26
 langchain-core>=0.1.26
 langchain-google-genai>=0.0.9
+notion-client>=2.2.1
+google-api-python-client>=2.100.0
+google-auth>=2.20.0
