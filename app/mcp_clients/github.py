@@ -74,3 +74,24 @@ async def post_pr_comment(repo_full_name: str, pr_number: int, body: str) -> str
         response = await client.post(url, headers=headers, json={"body": body})
         response.raise_for_status()
         return f"Comment posted successfully to PR #{pr_number}"
+    
+
+@github_mcp.tool()
+async def get_pr_files(repo_full_name: str, pr_number: int) -> list[str]:
+    # Fetches the list of file paths modified in a specific Pull Request
+
+    token = get_github_token()
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    
+    async with httpx.AsyncClient() as client:
+        url = f"https://api.github.com/repos/{repo_full_name}/pulls/{pr_number}/files"
+        response = await client.get(url, headers=headers)
+        response.raise_for_status()
+        
+        files_data = response.json()
+        file_paths = [file["filename"] for file in files_data]
+        
+        return file_paths
