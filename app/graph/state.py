@@ -22,4 +22,5 @@ class ArchivistState(TypedDict):
     pr_title: str
     pr_body: str
     pr_file_paths: List[str]
+    pr_head_sha: str
     metadata_score: int

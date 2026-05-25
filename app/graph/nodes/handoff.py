@@ -1,6 +1,8 @@
 import asyncio
+from hashlib import sha1
 from app.graph.state import ArchivistState
 from app.mcp_clients.github import post_pr_comment
+from app.mcp_clients.github import post_pr_comment, set_commit_status
 
 async def handoff_to_github(state: ArchivistState) -> dict:
     print("\n--- HANDOFF AGENT: Drafting and posting GitHub Comment ---")
@@ -26,4 +28,5 @@ I reviewed this Pull Request against our internal Architecture Decision Records 
     await post_pr_comment(repo, pr_num, comment_body)
     print(f"Comment successfully posted to PR #{pr_num}!")
     
+    await set_commit_status(repo, sha1, "failure", "Architectural violation detected.")
     return {"final_comment": comment_body}

@@ -2,6 +2,7 @@ import logging
 from fastapi import APIRouter, Request, BackgroundTasks
 from app.graph.workflow import archivist_app
 from app.mcp_clients.github import get_pr_files
+from app.mcp_clients.github import get_pr_files, set_commit_status, get_pr_head_sha
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("archivist")
@@ -21,14 +22,37 @@ async def run_archivist_pipeline(initial_state: dict):
 @router.post("/github")
 async def github_webhook(request: Request, background_tasks: BackgroundTasks):
     payload = await request.json()
+    action = payload.get("action")
+    repo_full_name = payload.get("repository", {}).get("full_name")
+
+    if "comment" in payload and "issue" in payload:
+
+        if action == "created":
+            comment_body = payload["comment"]["body"].strip()
+            if comment_body == "/archivist dismiss":
+                issue_number = payload["issue"]["number"]
+                logger.info(f"🔓 Dismiss command received for PR #{issue_number}")
+                
+                # Fetch the SHA and override the status
+                try:
+                    sha = await get_pr_head_sha(repo_full_name, issue_number)
+                    await set_commit_status(
+                        repo_full_name, 
+                        sha, 
+                        "success", 
+                        "Architectural violation dismissed by user."
+                    )
+                    logger.info(f"✅ PR #{issue_number} unblocked successfully.")
+                except Exception as e:
+                    logger.error(f"Failed to unblock PR: {e}")
+                    
+        return {"status": "accepted", "message": "Comment processed."}
     
     if "pull_request" not in payload:
         return {"status": "ignored", "reason": "Not a pull request event"}
         
-    action = payload.get("action")
     pr = payload.get("pull_request", {})
     pr_number = pr.get("number")
-    repo_full_name = payload.get("repository", {}).get("full_name")
     
     if pr.get("draft") is True:
         logger.info(f"Dropped PR #{pr_number}: Draft status.")
@@ -57,9 +81,10 @@ async def github_webhook(request: Request, background_tasks: BackgroundTasks):
     initial_state = {
         "repo_full_name": repo_full_name,
         "pr_number": pr_number,
-        "pr_title": pr_title,
-        "pr_body": pr_body,
-        "pr_file_paths": pr_file_paths
+        "pr_title": pr.get("title", ""),
+        "pr_body": pr.get("body") or "",
+        "pr_head_sha": pr.get("head", {}).get("sha"),
+        "pr_file_paths": await get_pr_files(repo_full_name, pr_number)
     }
     
     background_tasks.add_task(run_archivist_pipeline, initial_state)
