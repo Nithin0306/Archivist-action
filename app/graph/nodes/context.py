@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from langchain_google_genai import ChatGoogleGenerativeAI
 from app.graph.state import ArchivistState
 from app.mcp_clients.github import get_pr_diff
+from app.utils.config import LLM_MODEL
 
 class IntentExtraction(BaseModel):
     domains: list[str] = Field(
@@ -24,7 +25,7 @@ async def extract_context(state: ArchivistState) -> dict:
         
     print("\n--- CONTEXT AGENT: Extracting Architectural Intents ---")
     
-    llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash", temperature=0)
+    llm = ChatGoogleGenerativeAI(model=LLM_MODEL, temperature=0)
     structured_llm = llm.with_structured_output(IntentExtraction)
     
     prompt = f"""

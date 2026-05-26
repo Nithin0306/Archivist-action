@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from langchain_google_genai import ChatGoogleGenerativeAI
 from app.graph.state import ArchivistState
 from app.mcp_clients.github import set_commit_status
+from app.utils.config import LLM_MODEL
 
 class EvaluationVerdict(BaseModel):
     violation_found: bool = Field(description="True if a violation occurred, False otherwise.")
@@ -33,7 +34,7 @@ async def evaluate_code(state: ArchivistState) -> dict:
                 
         return {"violation_found": False, "evaluation_result": "No applicable ADRs found."}
 
-    llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash", temperature=0)
+    llm = ChatGoogleGenerativeAI(model=LLM_MODEL, temperature=0)
     structured_llm = llm.with_structured_output(EvaluationVerdict)
     
     if diff:

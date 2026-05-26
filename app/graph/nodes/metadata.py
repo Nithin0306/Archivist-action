@@ -2,6 +2,7 @@ from typing import List
 from pydantic import BaseModel, Field
 from langchain_google_genai import ChatGoogleGenerativeAI
 from app.graph.state import ArchivistState
+from app.utils.config import LLM_MODEL
 
 class MetadataAnalysis(BaseModel):
     score: int = Field(description="Score from 0 to 10 evaluating the detail and architectural clarity of the PR description and PR title.")
@@ -15,7 +16,7 @@ def match_metadata(state: ArchivistState) -> dict:
     body = state.get("pr_body", "")
     files = state.get("pr_file_paths", [])
     
-    llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash", temperature=0)
+    llm = ChatGoogleGenerativeAI(model=LLM_MODEL, temperature=0)
     structured_llm = llm.with_structured_output(MetadataAnalysis)
     
     prompt = f"""

@@ -1,15 +1,36 @@
 name: 'Archivist Architecture Review'
 description: 'Autonomous Staff Engineer that enforces architectural rules on Pull Requests.'
 inputs:
+  # Required Inputs
   github_token:
     description: 'GitHub token for API access'
     required: true
   gemini_api_key:
     description: 'Gemini API Key for the LLM'
     required: true
+    
+  # Optional Inputs
+  notion_token:
+    description: 'Notion Integration Token'
+    required: false
+  notion_db_id:
+    description: 'Notion ADR Database ID'
+    required: false
+  gdocs_folder_id:
+    description: 'Google Drive Folder ID for ADRs'
+    required: false
+  llm_model:
+    description: 'The Gemini model to use (default: gemini-3.5-flash)'
+    required: false
+    default: 'gemini-3.5-flash'
+
 runs:
   using: 'docker'
   image: 'Dockerfile'
   env:
     GITHUB_TOKEN: ${{ inputs.github_token }}
     GEMINI_API_KEY: ${{ inputs.gemini_api_key }}
+    NOTION_TOKEN: ${{ inputs.notion_token }}
+    NOTION_DATABASE_ID: ${{ inputs.notion_db_id }}
+    GDOCS_ADR_FOLDER_ID: ${{ inputs.gdocs_folder_id }}
+    ARCHIVIST_LLM_MODEL: ${{ inputs.llm_model }}
