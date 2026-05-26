@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from langchain_google_genai import ChatGoogleGenerativeAI
 from app.graph.state import ArchivistState
-from app.mcp_clients.github import set_commit_status 
+from app.mcp_clients.github import set_commit_status
 
 class EvaluationVerdict(BaseModel):
     violation_found: bool = Field(description="True if a violation occurred, False otherwise.")
@@ -18,16 +18,22 @@ async def evaluate_code(state: ArchivistState) -> dict:
     
     repo = state.get("repo_full_name", "")
     sha = state.get("pr_head_sha", "")
+    pr_num = state.get("pr_number", 0)
+    
+    is_local = (pr_num == 0 or repo == "local/repository")
     
     if "No specific architectural rules found" in adrs:
         print("No relevant ADRs to enforce. Passing PR.")
         
-        if repo and sha:
-            await set_commit_status(repo, sha, "success", "No applicable ADRs found. Code looks good.")
-            
+        if not is_local and repo and sha:
+            try:
+                await set_commit_status(repo, sha, "success", "No applicable ADRs found. Code looks good.")
+            except Exception as e:
+                print(f"Failed to set status: {e}")
+                
         return {"violation_found": False, "evaluation_result": "No applicable ADRs found."}
 
-    llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0)
+    llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash", temperature=0)
     structured_llm = llm.with_structured_output(EvaluationVerdict)
     
     if diff:
@@ -51,8 +57,11 @@ async def evaluate_code(state: ArchivistState) -> dict:
     result = structured_llm.invoke(prompt)
     print(f"Verdict: {'🚨 VIOLATION' if result.violation_found else '✅ PASS'}")
     
-    if not result.violation_found and repo and sha:
-        await set_commit_status(repo, sha, "success", "Architectural review passed!")
+    if not result.violation_found and not is_local and repo and sha:
+        try:
+            await set_commit_status(repo, sha, "success", "Architectural review passed!")
+        except Exception as e:
+            print(f"Failed to set status: {e}")
     
     return {
         "violation_found": result.violation_found,
