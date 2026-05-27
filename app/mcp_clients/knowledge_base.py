@@ -1,5 +1,5 @@
 import os
-from .local_mock import get_mock_adrs
+from .local_md import get_mock_adrs
 from .notion import fetch_notion_adrs
 from .google_docs import fetch_gdocs_adrs
 
