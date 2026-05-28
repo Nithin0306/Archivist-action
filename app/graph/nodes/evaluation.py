@@ -45,9 +45,12 @@ async def evaluate_code(state: ArchivistState) -> dict:
         print("Evaluating based on METADATA (Fast Path).")
         
     prompt = f"""
-    You are an expert Staff Engineer acting as an automated architectural governance engine.
-    Review the following PR context against the provided Architecture Decision Records (ADRs).
-    Determine IF the PR violates any of the strict rules laid out in the ADRs.
+    You are a strict architectural governance AI. Evaluate the provided code against the ADRs.
+    If you find a violation, you MUST format your explanation beautifully using Markdown:
+    - Use **bold text** for the ADR name.
+    - Use bullet points for each distinct violation.
+    - Add line breaks between points for readability.
+    - Do not write a single block of text.
     
     --- ADRs (The Rules) ---
     {adrs}
