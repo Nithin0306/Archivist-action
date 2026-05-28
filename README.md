@@ -71,7 +71,7 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Run Archivist AI
-        uses: your-username/archivist-action@main
+        uses: Nithin0306/archivist-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}

@@ -45,12 +45,16 @@ async def evaluate_code(state: ArchivistState) -> dict:
         print("Evaluating based on METADATA (Fast Path).")
         
     prompt = f"""
-    You are a strict architectural governance AI. Evaluate the provided code against the ADRs.
-    If you find a violation, you MUST format your explanation beautifully using Markdown:
+    You are a strict, professional architectural governance AI. Evaluate the provided code against the provided ADRs.
+    If you find a violation, you MUST format your explanation beautifully using Markdown.
+
+    CRITICAL INSTRUCTIONS:
+    - DO NOT include any conversational filler, introductions, or pleasantries.
+    - DO NOT start your response with phrases like "Yes, violations were found" or "Here are the violations".
+    - Start immediately with the first bullet point.
     - Use **bold text** for the ADR name.
-    - Use bullet points for each distinct violation.
-    - Add line breaks between points for readability.
-    - Do not write a single block of text.
+    - Use sub-bullets for each distinct violation under that ADR.
+    - Output ONLY the raw Markdown list of violations.
     
     --- ADRs (The Rules) ---
     {adrs}
