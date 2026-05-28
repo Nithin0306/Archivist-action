@@ -1,3 +1,8 @@
+# 🏛️ Archivist: Autonomous Architecture Governance Engine
+
+
+> An event-driven, AI-native Staff Engineer that enforces plain-text Architecture Decision Records (ADRs) directly on GitHub Pull Requests.
+
 ## 📖 The Problem: Architectural Drift in the Era of "Vibe Coding"
 In today’s fast-paced, AI-accelerated landscape, writing code has never been easier or faster. We live in the era of **"vibe coding"**, where entire features are generated at breakneck speeds. 
 
