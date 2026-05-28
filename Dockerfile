@@ -7,7 +7,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app/ ./app/
 COPY entrypoint.py .
-COPY ADR/ADR-001.md .  
 
 # GitHub Actions overrides the entrypoint, but this sets the default command
 ENTRYPOINT ["python", "/app/entrypoint.py"]
