@@ -50,6 +50,11 @@ on:
   pull_request:
     types: [opened, synchronize]
 
+permissions:
+  contents: read           # Required to read the repository code
+  pull-requests: write     # Required to read PR diffs and post comments
+  statuses: write          # Required to set the Green ✅ / Red ❌ commit status
+
 jobs:
   archivist-review:
     runs-on: ubuntu-latest
