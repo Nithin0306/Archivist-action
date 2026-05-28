@@ -1,11 +1,11 @@
-# 🏛️ Archivist: Autonomous Architecture Governance Engine
+## 📖 The Problem: Architectural Drift in the Era of "Vibe Coding"
+In today’s fast-paced, AI-accelerated landscape, writing code has never been easier or faster. We live in the era of **"vibe coding"**, where entire features are generated at breakneck speeds. 
 
-> An event-driven, AI-native Staff Engineer that enforces plain-text Architecture Decision Records (ADRs) directly on GitHub Pull Requests.
+But this velocity comes with a massive hidden cost: **Teams completely lose track of the true architecture they originally designed.**
 
-## 📖 The Problem: Architectural Drift
-Engineering teams spend weeks defining system boundaries in Notion, Google Docs, or Markdown files (e.g., *"Frontend components must never connect directly to the database"*). However, developers don't memorize 50 pages of documentation. Slowly, the codebase degrades into spaghetti code. 
+While engineering teams spend weeks carefully mapping out system boundaries and patterns in Notion, Google Docs, or Markdown files (e.g., *"Frontend components must never connect directly to the database"*), these rules are easily forgotten in the rush to ship. Developers don't memorize 50 pages of documentation, and AI code assistants don't read them either. 
 
-Standard CI/CD tools (like ESLint) rely on **static analysis** and regex—they can catch syntax errors, but they cannot enforce **semantic architectural boundaries**.
+The inevitable result is a clumsy, tangled codebase where components leak into forbidden boundaries. Eventually, teams hit a wall where **they find it difficult to understand, trace, or maintain their own code**. Standard CI/CD tools (like ESLint) rely strictly on structural syntax and formatting checks—they are completely blind to these deep, **semantic architectural rules**.
 
 ## 🚀 The Solution
 **Archivist** is a drop-in GitHub Action that acts as an automated Staff Engineer. It reads your Pull Requests, dynamically fetches relevant architectural rules via **Model Context Protocol (MCP)** integrations, semantically evaluates the code using an LLM, and blocks the merge button if a violation occurs. 
@@ -71,7 +71,8 @@ Archivist uses a stateful LangGraph pipeline to execute a multi-step reasoning c
 2. **Metadata Matcher:** Evaluates the quality of the PR title and description. It dynamically routes the graph to a lightweight **Fast Path** for well-documented PRs, or forces a **Deep Path** to pull the raw code diff if the description is vague.
 3. **Context Agent:** Analyzes the PR context (and full code diff, if on the Deep Path) to identify the specific architectural domains being modified (e.g., "Frontend", "Database", "CI/CD").
 4. **Knowledge Agent:** Queries the **Knowledge Base Router** (seamlessly checking Local Markdown, Notion, and Google Docs) to retrieve *only* the Architecture Decision Records (ADRs) relevant to those exact domains.
-5. **Evaluation Agent:** The LLM cross-references the code changes against the plain-text architectural rules. If the code complies, it uses the GitHub API to set a passing (green) status check on the commit.
-6. **Handoff:** If a violation is found, Archivist posts a detailed markdown comment on the PR outlining the breach, and forces a failed (red) status check to explicitly block the merge button.
+5. **Evaluation Agent:** The LLM cross-references the code changes against the plain-text architectural rules. If the code complies, it uses the GitHub API to apply a passing (**green checkmark**) Commit Status check directly to the Pull Request.
+6. **Handoff:** If a violation is found, Archivist posts a detailed markdown comment on the PR outlining the breach, and applies a failed (**red 'X'**) Commit Status check to explicitly block the repository's merge button.
 
+![Archivist Agentic Workflow](./workflow_viz.png)
 ---
