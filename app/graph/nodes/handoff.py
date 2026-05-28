@@ -13,7 +13,7 @@ async def handoff_to_github(state: ArchivistState) -> dict:
 🚨 **Architectural Drift Detected**
 {reasoning}
 ---
-*Reply with `/archivist dismiss` to override this block and accept the technical debt.*"""
+*Reply with `/archivist_dismiss` to override this block and accept the technical debt.*"""
     
     # Skips GitHub API if running via local CLI
     if pr_num == 0:
