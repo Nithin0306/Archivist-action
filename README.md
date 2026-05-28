@@ -33,14 +33,22 @@ By operating entirely within GitHub Actions, Archivist requires zero external se
 
 You can add Archivist to any repository in under two minutes.
 
-**1. Add your API Key**
+**1. Grant Workflow Permissions (Critical)**
+GitHub strictly limits Action permissions by default. You must allow Archivist to post comments on your PRs:
+* Go to your repository's **Settings > Actions > General**.
+* Scroll down to **Workflow permissions**.
+* Select **Read and write permissions**.
+* Check the box for **"Allow GitHub Actions to create and approve pull requests"**.
+* Click **Save**.
+
+**2. Add your API Key**
 Go to your repository's **Settings > Secrets and variables > Actions** and add a new secret:
 * `GEMINI_API_KEY`: Your Google Gemini API Key.
 
-**2. Add your Rules**
+**3. Add your Rules**
 Create an `ADR/` folder in the root of your repository and add your architectural rules as simple `.md` files.
 
-**3. Create the Workflow**
+**4. Create the Workflow**
 Add the following file to `.github/workflows/archivist.yml`:
 
 ```yaml
