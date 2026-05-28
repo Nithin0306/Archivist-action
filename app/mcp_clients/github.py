@@ -1,6 +1,4 @@
 import os
-import time
-import jwt
 import httpx
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
@@ -10,40 +8,12 @@ load_dotenv()
 github_mcp = FastMCP("Archivist-GitHub")
 
 def get_github_token() -> str:
-    # Generates a short-lived installation access token for the GitHub app
-    app_id = os.getenv("GITHUB_APP_ID")
-    key_path = os.getenv("GITHUB_PRIVATE_KEY_PATH")
-    
-    with open(key_path, 'r') as f:
-        private_key = f.read()
+    # Retrieves the built-in GitHub token provided by the GitHub Action environment.
 
-    # Creates the JWT (valid for 10 minutes)
-    payload = {
-        "iat": int(time.time()),
-        "exp": int(time.time()) + (10 * 60),
-        "iss": app_id
-    }
-    encoded_jwt = jwt.encode(payload, private_key, algorithm="RS256")
-
-    # Get the Installation ID (Assumes app is installed on 1 repo for now)
-    headers = {
-        "Authorization": f"Bearer {encoded_jwt}",
-        "Accept": "application/vnd.github.v3+json"
-    }
-    
-    with httpx.Client() as client:
-        # Fetch installations for this app
-        resp = client.get("https://api.github.com/app/installations", headers=headers)
-        resp.raise_for_status()
-        install_id = resp.json()[0]["id"]
-        
-        # Exchange JWT for installation access token
-        token_resp = client.post(
-            f"https://api.github.com/app/installations/{install_id}/access_tokens",
-            headers=headers
-        )
-        token_resp.raise_for_status()
-        return token_resp.json()["token"]
+    token = os.getenv("GITHUB_TOKEN")
+    if not token:
+        raise ValueError("GITHUB_TOKEN environment variable is missing!")
+    return token
 
 @github_mcp.tool()
 async def get_pr_diff(repo_full_name: str, pr_number: int) -> str:
