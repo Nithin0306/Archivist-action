@@ -1,7 +1,7 @@
 import os
 import glob
 
-async def get_mock_adrs(intents: list[str]) -> str:
+async def fetch_local_adrs(intents: list[str]) -> str:
     """
     Reads all architectural rules from the ADR directory in the user's repository.
     """

@@ -1,12 +1,20 @@
 import os
+import json
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 
 GDOCS_FOLDER_ID = os.getenv("GDOCS_ADR_FOLDER_ID")
+GOOGLE_CREDS_JSON = os.getenv("GOOGLE_CREDENTIALS_JSON") 
 
 def get_gdocs_service():
-    scopes = ['https://www.googleapis.com/auth/drive.readonly', 'https://www.googleapis.com/auth/documents.readonly']
-    creds = Credentials.from_service_account_file('google_credentials.json', scopes=scopes)
+    scopes = [
+        'https://www.googleapis.com/auth/drive.readonly', 
+        'https://www.googleapis.com/auth/documents.readonly'
+    ]
+    
+    creds_dict = json.loads(GOOGLE_CREDS_JSON)
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+    
     drive_service = build('drive', 'v3', credentials=creds)
     docs_service = build('docs', 'v1', credentials=creds)
     return drive_service, docs_service
@@ -27,7 +35,8 @@ def extract_text_from_doc(docs_service, document_id):
 
 async def fetch_gdocs_adrs(intents: list[str]) -> str:
     """Finds ADR docs in a Drive folder and extracts their text."""
-    if not GDOCS_FOLDER_ID or not os.path.exists('google_credentials.json'):
+    if not GDOCS_FOLDER_ID or not GOOGLE_CREDS_JSON:
+        print("Google Docs credentials or Folder ID missing. Skipping GDocs retrieval.")
         return ""
         
     drive_service, docs_service = get_gdocs_service()

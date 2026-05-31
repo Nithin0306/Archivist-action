@@ -71,15 +71,16 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Run Archivist AI
-        uses: Nithin0306/archivist-action@v1
+        uses: Nithin0306/Archivist-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          # Optional: Add Notion or Google Docs tokens here!
-
+          
+          # Optional: Add external knowledge base tokens here!
           # notion_token: ${{ secrets.NOTION_TOKEN }}
-          # notion_db_id: ${{ secrets.NOTION_DB_ID }}
-          # gdocs_folder_id: ${{ secrets.GDOCS_FOLDER_ID }}
+          # notion_database_id: ${{ secrets.NOTION_DATABASE_ID }}
+          # gdocs_adr_folder_id: ${{ secrets.GDOCS_FOLDER_ID }}
+          # google_credentials_json: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
 ```
 ## ⚙️ The Agentic Workflow (Vertical Slice)
 
